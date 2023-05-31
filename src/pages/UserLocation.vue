@@ -1,43 +1,48 @@
 !<template>
-  <b-row class="justify-content-center">
-    <b-col cols="6" class="bg-info p-3 rounded-lg">
-      <div class="bg-danger">
-        <span v-show="error">{{ error }}</span>
-      </div>
-      <b-form-group
-        id="fieldset-1"
-        description="Nos permita saber seu endereço."
-        label-for="input-1"
-        valid-feedback="Obrigado!"
-      >
-        <b-input-group class="mt-3">
-          <b-form-input
-            id="autocomplete"
-            placeholder="Digite seu endereço"
-            v-model="endereco"
-            trim
+  <div>
+    <section class="position-relative" style="z-index: 1">
+      <b-row class="justify-content-center">
+        <b-col cols="6" class="bg-info p-3 rounded-lg">
+          <div class="bg-danger">
+            <span v-show="error">{{ error }}</span>
+          </div>
+          <b-form-group
+            id="fieldset-1"
+            description="Nos permita saber seu endereço."
+            label-for="input-1"
+            valid-feedback="Obrigado!"
           >
-          </b-form-input>
-          <template #append>
-            <b-input-group-text>
-              <span @click="localizarBotaoPressionado">
-                <b-icon
-                  v-if="!isLoading"
-                  style="width: 1.5rem; height: 1.5rem;"
-                  icon="geo-alt-fill"
-                >
-                </b-icon>
-                <b-spinner
-                  v-else
-                  style="width: 1.5rem; height: 1.5rem;"
-                ></b-spinner>
-              </span>
-            </b-input-group-text>
-          </template>
-        </b-input-group>
-      </b-form-group>
-    </b-col>
-  </b-row>
+            <b-input-group class="mt-3">
+              <b-form-input
+                id="autocomplete"
+                placeholder="Digite seu endereço"
+                v-model="endereco"
+                trim
+              >
+              </b-form-input>
+              <template #append>
+                <b-input-group-text>
+                  <span @click="localizarBotaoPressionado">
+                    <b-icon
+                      v-if="!isLoading"
+                      style="width: 1.5rem; height: 1.5rem;"
+                      icon="geo-alt-fill"
+                    >
+                    </b-icon>
+                    <b-spinner
+                      v-else
+                      style="width: 1.5rem; height: 1.5rem;"
+                    ></b-spinner>
+                  </span>
+                </b-input-group-text>
+              </template>
+            </b-input-group>
+          </b-form-group>
+        </b-col>
+      </b-row>
+    </section>
+    <section id="map"></section>
+  </div>
 </template>
 
 <script>
@@ -51,7 +56,7 @@ export default {
     };
   },
   mounted() {
-    new google.maps.places.Autocomplete(
+    let autocomplete = new google.maps.places.Autocomplete(
       document.getElementById("autocomplete"),
       {
         bounds: new google.maps.LatLngBounds(
@@ -59,6 +64,13 @@ export default {
         )
       }
     );
+    autocomplete.addListener("place_changed", () => {
+      let place = autocomplete.getPlace();
+      this.showUserLocalizacaoNoMapa(
+        place.geometry.location.lat(),
+        place.geometry.location.lng()
+      );
+    });
   },
   computed: {
     state() {
@@ -77,6 +89,10 @@ export default {
         navigator.geolocation.getCurrentPosition(
           position => {
             this.getEnderecoFrom(
+              position.coords.latitude,
+              position.coords.longitude
+            );
+            this.showUserLocalizacaoNoMapa(
               position.coords.latitude,
               position.coords.longitude
             );
@@ -111,6 +127,18 @@ export default {
           console.log(error.message);
         });
       this.isLoading = false;
+    },
+    showUserLocalizacaoNoMapa(lat, long) {
+      let map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 15,
+        center: new google.maps.LatLng(lat, long),
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      });
+
+      new google.maps.Marker({
+        position: new google.maps.LatLng(lat, long),
+        map: map
+      });
     }
   }
 };
@@ -131,5 +159,14 @@ export default {
 
 .pac-item-query {
   font-size: 16px;
+}
+
+#map {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background-color: greenyellow;
 }
 </style>
