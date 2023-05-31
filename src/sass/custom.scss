@@ -1,0 +1,11 @@
+// File: custom.scss
+@import "~bootstrap/scss/bootstrap.scss";
+@import "~bootstrap-vue/src/index.scss";
+
+body {
+  margin: 0;
+}
+
+.my-widget {
+  background-color: pink;
+}

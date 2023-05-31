@@ -2,7 +2,7 @@
   <div>
     <section class="position-relative" style="z-index: 1">
       <b-row class="justify-content-center">
-        <b-col cols="6" class="bg-info p-3 rounded-lg">
+        <b-col cols="6" class="my-widget p-3 rounded-lg">
           <div class="bg-danger">
             <span v-show="error">{{ error }}</span>
           </div>
@@ -55,6 +55,7 @@ export default {
       isLoading: false
     };
   },
+
   mounted() {
     let autocomplete = new google.maps.places.Autocomplete(
       document.getElementById("autocomplete"),
@@ -72,16 +73,7 @@ export default {
       );
     });
   },
-  computed: {
-    state() {
-      return this.name.length >= 4;
-    },
-    invalidFeedback() {
-      if (this.name.length > 0) {
-        return "Enter at least 4 characters.";
-      }
-    }
-  },
+  computed: {},
   methods: {
     localizarBotaoPressionado() {
       if (navigator.geolocation) {
@@ -168,5 +160,6 @@ export default {
   left: 0;
   bottom: 0;
   background-color: greenyellow;
+  z-index: -1;
 }
 </style>
