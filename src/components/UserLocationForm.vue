@@ -1,47 +1,55 @@
 !<template>
   <div>
-    <section class="position-relative" style="z-index: 1">
-      <b-row class="justify-content-center">
-        <b-col cols="6" class="bg-info p-3 rounded-lg">
-          <div class="bg-danger">
-            <span v-show="error">{{ error }}</span>
-          </div>
-          <b-form-group
-            id="fieldset-1"
-            description="Nos permita saber seu endereço."
-            label-for="input-1"
-            valid-feedback="Obrigado!"
-          >
-            <b-input-group class="mt-3">
-              <b-form-input
-                id="autocomplete"
-                placeholder="Digite seu endereço"
-                v-model="endereco"
-                trim
-              >
-              </b-form-input>
-              <template #append>
-                <b-input-group-text>
-                  <span @click="localizarBotaoPressionado">
-                    <b-icon
-                      v-if="!isLoading"
-                      style="width: 1.5rem; height: 1.5rem;"
-                      icon="geo-alt-fill"
-                    >
-                    </b-icon>
-                    <b-spinner
-                      v-else
-                      style="width: 1.5rem; height: 1.5rem;"
-                    ></b-spinner>
-                  </span>
-                </b-input-group-text>
-              </template>
-            </b-input-group>
-          </b-form-group>
-        </b-col>
-      </b-row>
-    </section>
-    <section id="map"></section>
+    <div class="br-16 mt-5 p-5 bg-danger mx-4 ">
+      <div class="text-center mb-4">
+        <h1 class="fonte-primaria fonte-bold text-white">
+          Find Your favorite place here!
+        </h1>
+        <h3 class="fonte-secundaria fonte-semi-bold text-white">
+          Selecione 3 coisas
+        </h3>
+      </div>
+      <div class="bg-light br-16 m-form p-3">
+        <div class="bg-danger">
+          <span v-show="error">{{ error }}</span>
+        </div>
+        <b-form-group
+          id="fieldset-1"
+          description="Nos permita saber seu endereço."
+          label-for="input-1"
+          valid-feedback="Obrigado!"
+        >
+          <b-input-group class="mt-3">
+            <b-form-input
+              id="autocomplete"
+              placeholder="Digite seu endereço"
+              v-model="endereco"
+              trim
+            >
+            </b-form-input>
+            <template #append>
+              <b-input-group-text>
+                <span @click="localizarBotaoPressionado">
+                  <b-icon
+                    v-if="!isLoading"
+                    style="width: 1.5rem; height: 1.5rem;"
+                    icon="geo-alt-fill"
+                  >
+                  </b-icon>
+                  <b-spinner
+                    v-else
+                    style="width: 1.5rem; height: 1.5rem;"
+                  ></b-spinner>
+                </span>
+              </b-input-group-text>
+            </template>
+          </b-input-group>
+        </b-form-group>
+      </div>
+      <div class="d-flex justify-content-center mt-3 m-form br-16">
+        <div id="map"></div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -55,6 +63,7 @@ export default {
       isLoading: false
     };
   },
+
   mounted() {
     let autocomplete = new google.maps.places.Autocomplete(
       document.getElementById("autocomplete"),
@@ -72,20 +81,16 @@ export default {
       );
     });
   },
-  computed: {
-    state() {
-      return this.name.length >= 4;
-    },
-    invalidFeedback() {
-      if (this.name.length > 0) {
-        return "Enter at least 4 characters.";
-      }
-    }
-  },
+  computed: {},
   methods: {
     localizarBotaoPressionado() {
       if (navigator.geolocation) {
         this.isLoading = true;
+        const options = {
+          maximumAge: 10000,
+          timeout: 5000,
+          enableHighAccuracy: true
+        };
         navigator.geolocation.getCurrentPosition(
           position => {
             this.getEnderecoFrom(
@@ -99,9 +104,10 @@ export default {
           },
           error => {
             this.error =
-              "Localziador não conseguiu achar seu endereço. Por favor digite manualmente.";
+              "A geolocalização não conseguiu achar seu endereço. Por favor digite manualmente.";
             console.log(error.message);
-          }
+          },
+          options
         );
       } else {
         this.error = error.message;
@@ -162,11 +168,7 @@ export default {
 }
 
 #map {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  background-color: greenyellow;
+  width: 100%;
+  height: 250px;
 }
 </style>
