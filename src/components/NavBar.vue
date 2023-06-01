@@ -1,6 +1,6 @@
 !<template>
   <div>
-    <b-navbar toggleable="sm" type="light" variant="light">
+    <b-navbar toggleable="sm" type="light" variant="light" class="mb-5 p-4">
       <b-navbar-toggle target="nav-text-collapse"></b-navbar-toggle>
       <b-navbar-brand>Fome de que...</b-navbar-brand>
     </b-navbar>

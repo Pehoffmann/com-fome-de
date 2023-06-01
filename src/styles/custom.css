@@ -1,0 +1,31 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&display=swap");
+
+.fonte-primaria {
+  font-family: "Poppins", sans-serif;
+}
+
+.fonte-secundaria {
+  font-family: "Noto Sans", sans-serif;
+}
+
+.fonte-normal {
+  font-weight: 400;
+}
+
+.fonte-semi-bold {
+  font-weight: 600;
+}
+
+.fonte-bold {
+  font-weight: 700;
+}
+
+.br-16 {
+  border-radius: 16px;
+}
+
+.m-form {
+  margin-left: 10rem;
+  margin-right: 10rem;
+}
