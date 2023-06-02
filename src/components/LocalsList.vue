@@ -48,11 +48,15 @@
           <b-button variant="outline-primary" @click="realizarBusca"
             >Buscar restaurantes proximos</b-button
           >
+          <div class="bg-info" style="max-height: 300px; overflow: auto;">
+            <div v-for="lugar in places" :key="lugar.id">
+              <h5>{{ lugar.name }}</h5>
+              <span>{{ lugar.vicinity }}</span>
+            </div>
+          </div>
         </div>
       </b-col>
-      <b-col class="bg-black">
-        <span>oi</span>
-      </b-col>
+      <b-col class="bg-black" ref="map"> </b-col>
     </b-row>
   </div>
 </template>
@@ -76,7 +80,8 @@ export default {
         { value: 10, text: "10KM" },
         { value: 15, text: "15KM" },
         { value: 20, text: "20KM" }
-      ]
+      ],
+      places: []
     };
   },
 
@@ -96,6 +101,12 @@ export default {
         place.geometry.location.lng()
       );
     });
+    autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace();
+      this.endereco = place.formatted_address;
+      this.lat = place.geometry.location.lat();
+      this.lng = place.geometry.location.lng();
+    });
   },
   computed: {},
   methods: {
@@ -103,18 +114,37 @@ export default {
       console.log(this.lat, this.lng, this.type, this.radious);
       const URL = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${
         this.lat
-      },${this.lng}&type=${this.type}&radious=${this.radious *
+      },${this.lng}&type=${this.type}&radius=${this.radious *
         1000}&key=AIzaSyBiiEWnvf7qxpopvFwg6ytCc_VrCX9k6kc`;
 
       axios
         .get(URL)
         .then(response => {
+          this.places = response.data.results;
+          this.mostrarLocaisNoMapa();
           console.log(response);
         })
         .catch(error => {
           this.error = error.message;
           console.log(error.message);
         });
+    },
+    mostrarLocaisNoMapa() {
+      const map = new google.maps.Map(this.$refs["map"], {
+        zoom: 15,
+        center: new google.maps.LatLng(this.lat, this.lng),
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      });
+
+      for (let i = 0; i < this.places.length; i++) {
+        const lat = this.places[i].geometry.location.lat;
+        const lng = this.places[i].geometry.location.lng;
+
+        const marker = new google.maps.Marker({
+          position: new google.maps.LatLng(lat, lng),
+          map: map
+        });
+      }
     },
     localizarBotaoPressionado() {
       if (navigator.geolocation) {
