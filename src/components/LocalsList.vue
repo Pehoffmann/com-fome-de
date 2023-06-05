@@ -66,6 +66,7 @@ import axios from "axios";
 export default {
   data() {
     return {
+      apiKey: "AIzaSyBiiEWnvf7qxpopvFwg6ytCc_VrCX9k6kc",
       endereco: "",
       error: "",
       isLoading: false,
@@ -114,8 +115,9 @@ export default {
       console.log(this.lat, this.lng, this.type, this.radious);
       const URL = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${
         this.lat
-      },${this.lng}&type=${this.type}&radius=${this.radious *
-        1000}&key=AIzaSyBiiEWnvf7qxpopvFwg6ytCc_VrCX9k6kc`;
+      },${this.lng}&type=${this.type}&radius=${this.radious * 1000}&key=${
+        this.apiKey
+      }`;
 
       axios
         .get(URL)
@@ -136,13 +138,42 @@ export default {
         mapTypeId: google.maps.MapTypeId.ROADMAP
       });
 
+      const infoWindow = new google.maps.InfoWindow();
+
       for (let i = 0; i < this.places.length; i++) {
         const lat = this.places[i].geometry.location.lat;
         const lng = this.places[i].geometry.location.lng;
+        const placeID = this.places[i].place_id;
 
         const marker = new google.maps.Marker({
           position: new google.maps.LatLng(lat, lng),
           map: map
+        });
+
+        google.maps.event.addListener(marker, "click", () => {
+          const URL = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/details/json?key=${this.apiKey}&place_id=${placeID}`;
+          axios
+            .get(URL)
+            .then(response => {
+              if (response.data.error_message) {
+                this.error = response.data.error_message;
+              } else {
+                const place = response.data.result;
+                infoWindow.setContent(`<div class="">
+                 <span>
+                  <b class="text-center">${place.name}</b>
+                 </span> <br>
+                 <span>${place.formatted_address}<br></span>
+                 <span>${place.formatted_phone_number}<br></span>
+                  </div>`);
+                infoWindow.open(map, marker);
+              }
+              console.log(response.data.result);
+            })
+            .catch(error => {
+              this.error = error.message;
+              console.log(error.message);
+            });
         });
       }
     },
@@ -182,7 +213,7 @@ export default {
     getEnderecoFrom(lat, long) {
       axios
         .get(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=AIzaSyBiiEWnvf7qxpopvFwg6ytCc_VrCX9k6kc`
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${this.apiKey}`
         )
         .then(response => {
           if (response.data.error_message) {
